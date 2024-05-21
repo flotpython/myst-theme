@@ -1,5 +1,18 @@
 # @myst-theme/article
 
+## 0.9.5
+
+### Patch Changes
+
+- 44b38217: Support inline navigation
+- Updated dependencies [a6b01523]
+  - @myst-theme/site@0.9.5
+  - @myst-theme/providers@0.9.5
+  - @myst-theme/jupyter@0.9.5
+  - @myst-theme/styles@0.9.5
+  - @myst-theme/common@0.9.5
+  - @myst-theme/icons@0.9.5
+
 ## 0.9.4
 
 ### Patch Changes

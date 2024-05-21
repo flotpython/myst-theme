@@ -1,5 +1,12 @@
 # myst-to-react
 
+## 0.9.5
+
+### Patch Changes
+
+- 0f053224: Use correct remoteBaseUrl on nested cross reference popups
+  - @myst-theme/providers@0.9.5
+
 ## 0.9.4
 
 ### Patch Changes
