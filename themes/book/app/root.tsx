@@ -1,5 +1,6 @@
 import type { LinksFunction, V2_MetaFunction, LoaderFunction } from '@remix-run/node';
 import tailwind from '~/styles/app.css';
+import fullscreenCss from '~/styles/fullscreen.css';
 import thebeCoreCss from 'thebe-core/dist/lib/thebe-core.css';
 import { getConfig } from '~/utils/loaders.server';
 import type { SiteLoader } from '@myst-theme/common';
@@ -41,6 +42,7 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
 export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: tailwind },
+    { rel: 'stylesheet', href: fullscreenCss },
     { rel: 'stylesheet', href: thebeCoreCss },
     {
       rel: 'stylesheet',

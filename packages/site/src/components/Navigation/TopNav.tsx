@@ -16,6 +16,7 @@ import { LoadingBar } from './Loading.js';
 import { HomeLink } from './HomeLink.js';
 import { ActionMenu } from './ActionMenu.js';
 import { ExternalOrInternalLink } from './Link.js';
+import { FullScreenButton } from '@myst-theme/book/app/routes/fullScreenButton.js';
 
 export const DEFAULT_NAV_HEIGHT = 60;
 
@@ -149,6 +150,7 @@ export function TopNav({ hideToc, hideSearch }: { hideToc?: boolean; hideSearch?
           <NavItems nav={nav} />
           <div className="flex-grow block"></div>
           {!hideSearch && <Search />}
+          <FullScreenButton />
           <ThemeButton />
           <div className="block sm:hidden">
             <ActionMenu actions={actions} />
