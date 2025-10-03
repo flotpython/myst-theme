@@ -97,6 +97,7 @@ export const ConfigurablePrimaryNavigation = ({
   return (
     <>
       {open && !mobileOnly && headings && (
+        // overlay to dim content when hamburger menu is open on mobile
         // Darkened backdrop behind the open sidebar on mobile.
         <div
           // It follows the same top-offset rules as the sidebar: header offset on desktop,
