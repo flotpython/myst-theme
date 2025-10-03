@@ -4,6 +4,7 @@ import 'thebe-core/dist/lib/thebe-core.css';
 import { getConfig } from '~/utils/loaders.server';
 import type { SiteLoader } from '@myst-theme/common';
 import { normalizeBaseURL } from '@myst-theme/common';
+import '~/styles/fullscreen.css';
 import {
   Document,
   responseNoSite,

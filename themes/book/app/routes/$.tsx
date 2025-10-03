@@ -11,6 +11,7 @@ import {
   ErrorUnhandled,
 } from '@myst-theme/site';
 import { getConfig, getPage, getStaticFileUrl } from '~/utils/loaders.server';
+import { FullScreenButton } from '../components/FullScreenButton.js';
 import type { SiteManifest } from 'myst-config';
 import {
   TabStateProvider,
@@ -125,6 +126,7 @@ function ArticlePageAndNavigationInternal({
         hideToc={hide_toc}
         hideSearch={hideSearch}
         navbarEnd={projectParts?.navbar_end?.mdast}
+        navActions={<FullScreenButton />}
       />
       <PrimaryNavigation
         sidebarRef={toc}
