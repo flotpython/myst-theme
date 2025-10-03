@@ -18,6 +18,7 @@ import { LoadingBar } from './Loading.js';
 import { HomeLink } from './HomeLink.js';
 import { ActionMenu } from './ActionMenu.js';
 import { ExternalOrInternalLink } from './Link.js';
+import { FullScreenButton } from '@myst-theme/book/app/routes/fullScreenButton.js';
 
 export const DEFAULT_NAV_HEIGHT = 60;
 
@@ -26,7 +27,7 @@ export function NavItem({ item }: { item: SiteNavItem }) {
   const baseurl = useBaseurl();
   if (!('children' in item)) {
     return (
-      <div className="myst-top-nav-item relative inline-block mx-2 grow-0">
+      <div className="relative inline-block mx-2 myst-top-nav-item grow-0">
         <ExternalOrInternalLink
           nav
           to={withBaseurl(item.url, baseurl) ?? ''}
@@ -45,7 +46,7 @@ export function NavItem({ item }: { item: SiteNavItem }) {
     );
   }
   return (
-    <Menu as="div" className="myst-top-nav-dropdown relative inline-block mx-2 grow-0">
+    <Menu as="div" className="relative inline-block mx-2 myst-top-nav-dropdown grow-0">
       <div className="inline-block">
         <Menu.Button className="inline-flex items-center justify-center w-full py-1 mx-2 font-medium rounded-md text-md text-stone-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
           <span>{item.title}</span>
@@ -65,7 +66,7 @@ export function NavItem({ item }: { item: SiteNavItem }) {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="myst-top-nav-dropdown-items absolute w-48 py-1 mt-2 origin-top-left bg-white rounded-sm shadow-lg left-4 ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute w-48 py-1 mt-2 origin-top-left bg-white rounded-sm shadow-lg myst-top-nav-dropdown-items left-4 ring-1 ring-black ring-opacity-5 focus:outline-none">
           {item.children?.map((action) => {
             const url = withBaseurl(action.url, baseurl) || '';
             return (
@@ -74,7 +75,7 @@ export function NavItem({ item }: { item: SiteNavItem }) {
                 {action.url?.startsWith('http') ? (
                   <a
                     href={url}
-                    className="myst-top-nav-dropdown-item block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black"
+                    className="block px-4 py-2 text-sm text-gray-700 myst-top-nav-dropdown-item hover:bg-gray-100 hover:text-black"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -144,7 +145,7 @@ export function TopNav({
               })}
             >
               <button
-                className="myst-top-nav-menu-button flex items-center justify-center border-stone-400 text-stone-800 hover:text-stone-900 dark:text-stone-200 hover:dark:text-stone-100 w-10 h-10"
+                className="flex items-center justify-center w-10 h-10 myst-top-nav-menu-button border-stone-400 text-stone-800 hover:text-stone-900 dark:text-stone-200 hover:dark:text-stone-100"
                 onClick={() => {
                   setOpen(!open);
                 }}
@@ -170,6 +171,7 @@ export function TopNav({
           {!hideSearch && <Search />}
           {/* Light/Dark theme button */}
           <ThemeButton className="w-8 h-8 ml-3" />
+          <FullScreenButton />
           {/* Custom part at end of navbar. It is `hidden` up until xl size since it will be in the sidebar drawer up to that point */}
           {navbarEnd && (
             <div className="article myst-navbar-end hidden xl:flex items-center ml-3 [&>*]:m-0">
