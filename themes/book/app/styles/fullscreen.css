@@ -1,0 +1,15 @@
+
+
+.fullscreen nav[aria-label="Table of Contents"] {
+  display: none;
+}
+.fullscreen nav[aria-label="Document Outline"] {
+  display: none;
+}
+
+
+
+body.fullscreen .article-grid > *, .article-left-grid > *, .article-center-grid > * {
+  /* make elements take more space in the parent grid. Overrides an existing rule in the app CSS. */
+  grid-column: page;
+}
