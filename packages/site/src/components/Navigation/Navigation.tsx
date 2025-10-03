@@ -91,6 +91,7 @@ export const ConfigurablePrimaryNavigation = ({
   return (
     <>
       {open && !mobileOnly && headings && (
+        // overlay to dim content when hamburger menu is open on mobile
         <div
           className="fixed inset-0 z-30 bg-black opacity-50"
           style={{ marginTop: top }}
