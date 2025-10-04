@@ -1,0 +1,96 @@
+name: Publish Book and Article as a GH Release
+
+# here's the content of a published theme zip
+# build/
+# public/
+# template.yml
+# package-lock.json  package.json
+# server.js
+# README.md (copied from the GH repo - hopefully not needed)
+
+# -- as per Makefile they come from
+# build:        themes/$(THEME)/build/    (built)
+# public:       themes/$(THEME)/public/   (built)
+# template.yml: themes/$(THEME)/          (built)
+# package.json: template/                 (sed template->$(THEME) and VERSION->$(VERSION)
+# server.js:    template/                 (as-is from repo)
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ '*' ]
+
+jobs:
+  github-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Run tests
+        run: npm run test
+
+      - name: build book
+        run: cd themes/book && npm run prod:build
+    #   - name: build article
+    #     run: cd themes/article && npm run prod:build
+
+      - name: package book
+        run: |
+          rm -rf dist-book && mkdir dist-book
+          cp -r themes/book/public dist-book/public
+          cp -r themes/book/build dist-book/build
+          cp -r themes/book/template.yml dist-book/template.yml
+          cp template/server.js dist-book/server.js
+          VERSION=$(node -p "require('./packages/site/package.json').version") && sed -e "s/VERSION/$VERSION/g" -e "s/THEME/book/g" template/package.json > dist-book/package.json
+          cd dist-book && npm install
+
+        # xxx publishing to npm kept out of this workflow for now
+
+      # Create zips
+      - name: zip artifacts
+        run: |
+          mkdir dist_zip
+          zip -r dist_zip/book-${GITHUB_SHA}.zip dist-book/
+        #   zip -r dist_zip/article-${GITHUB_SHA}.zip dist-article/
+
+      # Determine version/tag for naming
+      - name: Determine release name
+        id: vars
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            echo "name=${TAG}" >> $GITHUB_OUTPUT
+          else
+            echo "name=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          fi
+
+      # Rename final files to use tag if applicable
+      - name: Rename zips
+        run: |
+          if [[ "${{ steps.vars.outputs.name }}" != "${GITHUB_SHA}" ]]; then
+            mv dist_zip/book-${GITHUB_SHA}.zip dist_zip/book-${{ steps.vars.outputs.name }}.zip
+            # mv dist_zip/article-${GITHUB_SHA}.zip dist_zip/article-${{ steps.vars.outputs.name }}.zip
+          fi
+
+      # Publish both zips as release assets
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Build ${{ steps.vars.outputs.name }}"
+          tag_name: "${{ steps.vars.outputs.name }}"
+          files: |
+            dist_zip/book-${{ steps.vars.outputs.name }}.zip
+          # dist_zip/article-${{ steps.vars.outputs.name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
