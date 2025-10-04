@@ -61,8 +61,8 @@ jobs:
       - name: zip artifacts
         run: |
           mkdir dist_zip
-          zip -r dist_zip/book-${GITHUB_SHA}.zip dist-book/
-        #   zip -r dist_zip/article-${GITHUB_SHA}.zip dist-article/
+          zip -r dist_zip/book.zip dist-book/
+        #   zip -r dist_zip/article.zip dist-article/
 
       # Determine version/tag for naming
       - name: Determine release name
@@ -72,16 +72,16 @@ jobs:
             TAG="${GITHUB_REF#refs/tags/}"
             echo "name=${TAG}" >> $GITHUB_OUTPUT
           else
-            echo "name=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+            echo name=$(cut -c1-7 <<< "${GITHUB_SHA}") >> $GITHUB_OUTPUT
           fi
 
-      # Rename final files to use tag if applicable
-      - name: Rename zips
-        run: |
-          if [[ "${{ steps.vars.outputs.name }}" != "${GITHUB_SHA}" ]]; then
-            mv dist_zip/book-${GITHUB_SHA}.zip dist_zip/book-${{ steps.vars.outputs.name }}.zip
-            # mv dist_zip/article-${GITHUB_SHA}.zip dist_zip/article-${{ steps.vars.outputs.name }}.zip
-          fi
+    #   # Rename final files to use tag if applicable
+    #   - name: Rename zips
+    #     run: |
+    #       if [[ "${{ steps.vars.outputs.name }}" != "${GITHUB_SHA}" ]]; then
+    #         mv dist_zip/book-${GITHUB_SHA}.zip dist_zip/book-${{ steps.vars.outputs.name }}.zip
+    #         # mv dist_zip/article-${GITHUB_SHA}.zip dist_zip/article-${{ steps.vars.outputs.name }}.zip
+    #       fi
 
       # Publish both zips as release assets
       - name: Upload release assets
@@ -90,7 +90,7 @@ jobs:
           name: "Build ${{ steps.vars.outputs.name }}"
           tag_name: "${{ steps.vars.outputs.name }}"
           files: |
-            dist_zip/book-${{ steps.vars.outputs.name }}.zip
-          # dist_zip/article-${{ steps.vars.outputs.name }}.zip
+            dist_zip/book.zip
+          # dist_zip/article.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
