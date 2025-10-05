@@ -65,6 +65,7 @@ jobs:
         #   zip -r dist_zip/article.zip dist-article/
 
       # Determine version/tag for naming
+      # if this is a tagged build, use the tag
       - name: Determine release name
         id: vars
         run: |
