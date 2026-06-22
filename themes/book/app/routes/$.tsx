@@ -17,6 +17,7 @@ import {
   ErrorUnhandled,
 } from '@myst-theme/site';
 import { getConfig, getPage, getStaticFileUrl } from '~/utils/loaders.server';
+import { FullScreenButton } from './fullScreenButton.js';
 import { useLoaderData } from '@remix-run/react';
 import type { SiteManifest } from 'myst-config';
 import {
@@ -115,6 +116,7 @@ function ArticlePageAndNavigationInternal({
         hideToc={hide_toc}
         hideSearch={hideSearch}
         navbarEnd={projectParts?.navbar_end?.mdast}
+        navActions={<FullScreenButton />}
       />
       <PrimaryNavigation
         sidebarRef={toc}
