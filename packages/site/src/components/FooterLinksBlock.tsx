@@ -49,10 +49,16 @@ export const FooterLink = ({
   );
 };
 
-export function FooterLinksBlock({ links }: { links?: FooterLinks }) {
+export function FooterLinksBlock({
+  links,
+  className,
+}: {
+  links?: FooterLinks;
+  className?: string;
+}) {
   if (!links || (!links.navigation?.prev && !links.navigation?.next)) return null;
   return (
-    <div className="myst-footer-links flex pt-10 mb-10 space-x-4">
+    <div className={classNames('myst-footer-links flex space-x-4', className ?? 'pt-10 mb-10')}>
       {links.navigation?.prev && <FooterLink {...links.navigation?.prev} right />}
       {links.navigation?.next && <FooterLink {...links.navigation?.next} />}
     </div>

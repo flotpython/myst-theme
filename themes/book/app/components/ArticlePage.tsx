@@ -67,7 +67,14 @@ export const ArticlePage = React.memo(function ({
   const pageDesign: TemplateOptions = (article.frontmatter as any)?.site ?? {};
   const siteDesign: TemplateOptions =
     (useSiteManifest() as SiteManifest & TemplateOptions)?.options ?? {};
-  const { hide_title_block, hide_footer_links, hide_outline, outline_maxdepth, hide_authors } = {
+  const {
+    hide_title_block,
+    hide_footer_links,
+    hide_header_links,
+    hide_outline,
+    outline_maxdepth,
+    hide_authors,
+  } = {
     ...siteDesign,
     ...pageDesign,
   };
@@ -87,6 +94,9 @@ export const ArticlePage = React.memo(function ({
     >
       <BusyScopeProvider>
         <ExecuteScopeProvider enable={compute?.enabled ?? false} contents={article}>
+          {hide_header_links === false && (
+            <FooterLinksBlock links={article.footer} className="mb-10" />
+          )}
           {!hide_title_block && (
             <FrontmatterBlock
               kind={article.kind}

@@ -20,6 +20,9 @@ options:
     id: hide_footer_links
     description: Hide the previous/next links in the footer
   - type: boolean
+    id: hide_header_links
+    description: Hide the previous/next navigation links above the title block (shown at the bottom regardless). Defaults to true; set to false to show them.
+  - type: boolean
     id: hide_outline
     description: Hide the document outline on all pages
   - type: boolean
