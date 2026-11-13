@@ -72,6 +72,7 @@ export const ArticlePage = React.memo(function ({
   const {
     hide_title_block,
     hide_footer_links,
+    hide_header_links,
     hide_outline,
     hide_breadcrumbs,
     outline_maxdepth,
@@ -96,6 +97,9 @@ export const ArticlePage = React.memo(function ({
     >
       <BusyScopeProvider>
         <ExecuteScopeProvider enable={compute?.enabled ?? false} contents={article}>
+          {hide_header_links === false && (
+            <FooterLinksBlock links={article.footer} className="mb-10" />
+          )}
           {!hide_title_block && (
             <FrontmatterBlock
               kind={article.kind}
