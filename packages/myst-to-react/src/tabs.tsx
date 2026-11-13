@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import type { GenericNode } from 'myst-common';
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { selectAll } from 'unist-util-select';
 import { useTabSet, type NodeRenderer } from '@myst-theme/providers';
 import { MyST } from './MyST.js';
 
@@ -162,8 +161,10 @@ export function TabItem({
 }
 
 export const TabSetRenderer: NodeRenderer = ({ node, className }) => {
+  // Only the tab items of this set: those of a nested tab-set belong to that one
+  const items = (node.children ?? []).filter((child: GenericNode) => child.type === 'tabItem') as TabItem[];
   // Add the key as the ID (key is special in react)
-  const tabs = (selectAll('tabItem', node) as TabItem[]).map((tab) => ({
+  const tabs = items.map((tab) => ({
     title: tab.title,
     id: tab.key,
     sync: tab.sync,
