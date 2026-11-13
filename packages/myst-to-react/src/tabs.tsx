@@ -97,6 +97,7 @@ export const TabSetRenderer: NodeRenderer = ({ node, className }) => {
     title: tab.title,
     id: tab.key,
     sync: tab.sync,
+    selected: tab.selected,
   }));
   return (
     <TabSet tabs={tabs} className={className}>
