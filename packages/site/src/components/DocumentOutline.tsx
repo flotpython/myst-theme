@@ -8,6 +8,7 @@ import { DocumentChartBarIcon } from '@heroicons/react/24/outline';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { slugToUrl } from 'myst-common';
+import { scrollToElement } from 'myst-to-react';
 
 const SELECTOR = [1, 2, 3, 4].map((n) => `main h${n}`).join(', ');
 
@@ -72,14 +73,8 @@ const Headings = ({ headings, activeId }: Props) => (
           href={`#${heading.id}`}
           onClick={(e) => {
             e.preventDefault();
-            const el = document.querySelector(`#${heading.id}`) as HTMLElement | undefined;
-            if (!el) return;
-
-            el.scrollIntoView({ behavior: 'smooth' });
-            history.replaceState(undefined, '', `#${heading.id}`);
-            // Changes keyboard tab-index location
-            if (el.tabIndex === -1) el.tabIndex = -1;
-            el.focus({ preventScroll: true });
+            // also reveals the heading if it sits in a hidden tab
+            scrollToElement(document.getElementById(heading.id), { htmlId: heading.id });
           }}
           // Note that the title can have math in it!
           dangerouslySetInnerHTML={{ __html: heading.titleHTML }}
