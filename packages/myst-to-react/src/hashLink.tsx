@@ -1,6 +1,7 @@
 import { useXRefState } from '@myst-theme/providers';
 import classNames from 'classnames';
 import { useEffect } from 'react';
+import { openTabs } from './tabs.js';
 
 export type HashLinkBehavior = {
   /** When scrolling, is this `instant`, `auto` or `scroll`? */
@@ -33,7 +34,10 @@ export function scrollToElement(
 ) {
   if (!el) return;
   openDetails(el);
-  el.scrollIntoView({ behavior: scrollBehavior });
+  // the target may sit in a tab that is currently hidden, which needs a render to be revealed
+  const scroll = () => el.scrollIntoView({ behavior: scrollBehavior });
+  if (openTabs(el)) requestAnimationFrame(scroll);
+  else scroll();
   if (historyState === 'push') {
     history.pushState(undefined, '', `#${htmlId}`);
   } else if (historyState === 'replace') {

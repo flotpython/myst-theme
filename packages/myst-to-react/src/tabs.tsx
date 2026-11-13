@@ -1,25 +1,71 @@
 import classNames from 'classnames';
 import type { GenericNode } from 'myst-common';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { selectAll } from 'unist-util-select';
 import { useTabSet, type NodeRenderer } from '@myst-theme/providers';
 import { MyST } from './MyST.js';
 
 interface TabItem extends GenericNode {
   key: string;
+  html_id?: string;
   title: string;
   sync?: string;
   selected?: boolean;
 }
 
-const TabSetContext = createContext<string | undefined>(undefined);
+/** DOM event sent to a hidden tab item to ask it to become the active tab of its set */
+export const OPEN_TAB_EVENT = 'myst:open-tab';
+
+type TabSetState = { active: string; setActive: (id: string) => void };
+const TabSetContext = createContext<TabSetState | undefined>(undefined);
 
 // Create a provider for components to consume and subscribe to changes
-function TabSetStateProvider({ active, children }: { active: string; children: React.ReactNode }) {
-  return <TabSetContext.Provider value={active}>{children}</TabSetContext.Provider>;
+function TabSetStateProvider({
+  active,
+  setActive,
+  children,
+}: {
+  active: string;
+  setActive: (id: string) => void;
+  children: React.ReactNode;
+}) {
+  const value = useMemo(() => ({ active, setActive }), [active, setActive]);
+  return <TabSetContext.Provider value={value}>{children}</TabSetContext.Provider>;
+}
+
+/**
+ * Make sure that `el` is visible, by activating the tabs that contain it (if any).
+ * Returns true if at least one tab had to be switched.
+ */
+export function openTabs(el: HTMLElement | null): boolean {
+  let opened = false;
+  for (let node = el; node; node = node.parentElement) {
+    if (node.dataset?.tabItem != null && node.classList.contains('hidden')) {
+      node.dispatchEvent(new CustomEvent(OPEN_TAB_EVENT));
+      opened = true;
+    }
+  }
+  return opened;
 }
 
 type Tab = { title: string | React.ReactNode; id: string; sync?: string; selected?: boolean };
+
+/** Activate the tab(s) holding the element targeted by the URL fragment, on load and on hash change */
+function useRevealHash() {
+  useEffect(() => {
+    const reveal = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id) return;
+      // MyST lower-cases the ids generated from labels
+      const el = document.getElementById(id) ?? document.getElementById(id.toLowerCase());
+      // the tab switch needs a render before the target can be scrolled to
+      if (openTabs(el)) requestAnimationFrame(() => el?.scrollIntoView());
+    };
+    reveal();
+    window.addEventListener('hashchange', reveal);
+    return () => window.removeEventListener('hashchange', reveal);
+  }, []);
+}
 
 export function TabSet({
   tabs,
@@ -30,6 +76,7 @@ export function TabSet({
   children: React.ReactNode;
   className?: string;
 }) {
+  useRevealHash();
   const [lastClickedTab, onClickSyncedTab] = useTabSet() ?? [];
   const [active, setActive] = useState<string>(tabs.find((t) => t.selected)?.id ?? tabs?.[0]?.id);
   const onClick = (tab: Tab) => {
@@ -50,7 +97,7 @@ export function TabSet({
   }, [tabs, lastClickedTab, setActive]);
 
   return (
-    <TabSetStateProvider active={active}>
+    <TabSetStateProvider active={active} setActive={setActive}>
       <div className={classNames('myst-tab-set my-5', className)}>
         <div className="myst-tab-set-row flex flex-row flex-wrap overflow-x-auto border-b border-b-myst-border">
           {tabs.map((tab) => {
@@ -83,12 +130,35 @@ export function TabSet({
 
 export function TabItem({
   id,
+  htmlId,
   children,
   className,
-}: Omit<Tab, 'title' | 'sync'> & { children: React.ReactNode; className?: string }) {
-  const active = useContext(TabSetContext);
+}: Omit<Tab, 'title' | 'sync'> & {
+  htmlId?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const { active, setActive } = useContext(TabSetContext) ?? {};
   const open = active === id;
-  return <div className={classNames({ hidden: !open }, className)}>{children}</div>;
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // let links and the table of contents switch to this tab
+    const div = ref.current;
+    if (!div || !setActive) return;
+    const onOpen = () => setActive(id);
+    div.addEventListener(OPEN_TAB_EVENT, onOpen);
+    return () => div.removeEventListener(OPEN_TAB_EVENT, onOpen);
+  }, [id, setActive]);
+  return (
+    <div
+      ref={ref}
+      id={htmlId}
+      data-tab-item=""
+      className={classNames({ hidden: !open }, className)}
+    >
+      {children}
+    </div>
+  );
 }
 
 export const TabSetRenderer: NodeRenderer = ({ node, className }) => {
@@ -107,7 +177,7 @@ export const TabSetRenderer: NodeRenderer = ({ node, className }) => {
 
 export const TabItemRenderer: NodeRenderer<TabItem> = ({ node, className }) => {
   return (
-    <TabItem id={node.key} className={className}>
+    <TabItem id={node.key} htmlId={node.html_id} className={className}>
       <MyST ast={node.children} />
     </TabItem>
   );
